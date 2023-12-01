@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 class diaryAdapter : RecyclerView.Adapter<diaryAdapter.diaryViewHolder>(){
     private var diarList: ArrayList<DataDiary> = ArrayList()
     private var onClick:((DataDiary) -> Unit)? = null
+    private var onClickDeleteItem:((DataDiary) -> Unit)? = null
 
     fun addItems(items: ArrayList<DataDiary>){
         this.diarList = items
@@ -18,6 +19,11 @@ class diaryAdapter : RecyclerView.Adapter<diaryAdapter.diaryViewHolder>(){
 
     fun setOnClickItem(callback: (DataDiary) -> Unit){
         this.onClick = callback
+
+    }
+
+    fun setOnclickDeleteItem(callback: (DataDiary) -> Unit){
+        this.onClickDeleteItem = callback
 
     }
 
@@ -31,6 +37,7 @@ class diaryAdapter : RecyclerView.Adapter<diaryAdapter.diaryViewHolder>(){
         val diarry = diarList[position]
         holder.binViews(diarry)
         holder.itemView.setOnClickListener{ onClick?.invoke(diarry)}
+        holder.btnDelete.setOnClickListener{ onClickDeleteItem?.invoke(diarry)}
     }
 
     class diaryViewHolder(var view: View):RecyclerView.ViewHolder(view){
@@ -39,6 +46,7 @@ class diaryAdapter : RecyclerView.Adapter<diaryAdapter.diaryViewHolder>(){
         private var namePlace = view.findViewById<TextView>(R.id.txtNamePlace)
         private var timeEventr = view.findViewById<TextView>(R.id.txtNameEvento)
         private var dataEventr = view.findViewById<TextView>(R.id.txtDateEVent)
+         var btnDelete = view.findViewById<TextView>(R.id.btnDelete)
 
 
         fun binViews(diary: DataDiary){

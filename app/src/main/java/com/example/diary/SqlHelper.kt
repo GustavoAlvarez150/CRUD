@@ -53,16 +53,26 @@ class SqlHelper(context: Context): SQLiteOpenHelper(context, "diary.db", null, 1
         val queryGetAll = "SELECT * FROM diary"
 
         //Nos ayudara para obtener el resultado de nuestra consulta de manera secuencial
-       //var cursor: Cursor?
+       var cursor: Cursor?
         //Las rawQuery son consultas en crudo, que sería meramente puro sql
-         var cursor = db!!.rawQuery(queryGetAll, null)
-        var aux = cursor.getString(cursor.getColumnIndex("nombreEvento"))
+
+       try {
+           cursor = db!!.rawQuery(queryGetAll, null)
+       }catch (e: Exception){
+           e.printStackTrace()
+           db.execSQL(queryGetAll)
+           return ArrayList()
+
+       }
+
+
+
         if (cursor.moveToFirst()){
             do {
-                val diaryFill = DataDiary(namePlace = cursor.getString(2),
-                    nameEvent = cursor.getString(1),
-                    timeEvent = cursor.getString(3),
-                    dateEvent = cursor.getString(4))
+                val diaryFill = DataDiary(namePlace = cursor.getString(cursor.getColumnIndex("nombreEvento")),
+                    nameEvent = cursor.getString(cursor.getColumnIndex("lugarEvento")),
+                    timeEvent = cursor.getString(cursor.getColumnIndex("horaEvento")),
+                    dateEvent = cursor.getString(cursor.getColumnIndex("fechaEvento")))
 
                 //llenamos la lista
                 listInfo.add(diaryFill)
@@ -70,6 +80,35 @@ class SqlHelper(context: Context): SQLiteOpenHelper(context, "diary.db", null, 1
 
         }
         return listInfo
+
+    }
+
+    fun deleteDiary(nameEven: String):Int{
+
+        val db = this.writableDatabase
+        val contentValues = ContentValues()
+        contentValues.put("nombreEvento", nameEven)
+
+        val suc = db.delete("diary", "nombreEvento=$nameEven", null)
+        db.close()
+        return suc
+    }
+
+    fun updateDiary(di: DataDiary): Int{
+        val db = this.writableDatabase
+
+        val contentValues = ContentValues()
+        contentValues.put("nombreEvento", di.nameEvent)
+        contentValues.put("lugarEvento", di.namePlace)
+        contentValues.put("horaEvento", di.timeEvent)
+        contentValues.put("fechaEvento", di.dateEvent)
+
+        val done = db.update("diary", contentValues, "nombreEvento=" + di.nameEvent, null)
+
+        db.close()
+        return done
+
+
 
     }
 }
